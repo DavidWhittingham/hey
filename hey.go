@@ -28,7 +28,7 @@ import (
 	"runtime"
 	"strings"
 	"time"
-
+	"math/rand"
 	"github.com/rakyll/hey/requester"
 )
 
@@ -66,6 +66,9 @@ var (
 )
 
 var usage = `Usage: hey [options...] <url>
+
+url:
+	A ; separated list of URLs. Randomly choosen at runtime. Wrap string in starting/trailing " qoutes
 
 Options:
   -n  Number of requests to run. Default is 200.
@@ -135,7 +138,7 @@ func main() {
 		}
 	}
 
-	url := flag.Args()[0]
+	urls := strings.Split(flag.Args()[0], ";")
 	method := strings.ToUpper(*m)
 
 	// set content-type
@@ -189,6 +192,10 @@ func main() {
 		}
 	}
 
+	rand.Seed(time.Now().Unix())
+	n := rand.Int() % len(urls)
+	url := urls[n]
+
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		usageAndExit(err.Error())
@@ -213,6 +220,7 @@ func main() {
 	req.Header = header
 
 	w := &requester.Work{
+		Urls:				urls,
 		Request:            req,
 		RequestBody:        bodyAll,
 		N:                  num,

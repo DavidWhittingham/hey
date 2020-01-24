@@ -18,6 +18,7 @@ package requester
 import (
 	"bytes"
 	"crypto/tls"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -26,7 +27,7 @@ import (
 	"os"
 	"sync"
 	"time"
-
+	"math/rand"
 	"golang.org/x/net/http2"
 )
 
@@ -48,6 +49,9 @@ type result struct {
 }
 
 type Work struct {
+
+	Urls []string 
+
 	// Request is the request to be made.
 	Request *http.Request
 
@@ -147,6 +151,14 @@ func (b *Work) makeRequest(c *http.Client) {
 	var dnsStart, connStart, resStart, reqStart, delayStart time.Duration
 	var dnsDuration, connDuration, resDuration, reqDuration, delayDuration time.Duration
 	req := cloneRequest(b.Request, b.RequestBody)
+
+	rand.Seed(time.Now().Unix())
+	n := rand.Int() % len(b.Urls)
+	var reqUrl = b.Urls[n]
+	fmt.Fprintf(os.Stdout, "Sampling URL: %[1]s\n", reqUrl)	
+	u, err := url.Parse(reqUrl)
+	req.URL = u
+
 	trace := &httptrace.ClientTrace{
 		DNSStart: func(info httptrace.DNSStartInfo) {
 			dnsStart = now()
