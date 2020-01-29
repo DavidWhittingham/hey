@@ -105,6 +105,7 @@ Options:
 `
 
 func main() {
+
 	flag.Usage = func() {
 		fmt.Fprint(os.Stderr, fmt.Sprintf(usage, runtime.NumCPU()))
 	}
@@ -116,8 +117,9 @@ func main() {
 	if flag.NArg() < 1 {
 		usageAndExit("")
 	}
-
+	
 	runtime.GOMAXPROCS(*cpus)
+	rand.Seed(time.Now().Unix())
 	num := *n
 	conc := *c
 	q := *q
@@ -138,7 +140,25 @@ func main() {
 		}
 	}
 
-	urls := strings.Split(flag.Args()[0], ";")
+	// go build && hey -n 100 -c 1 -x http://localhost:8888 ""
+	var urls []string
+	// var service = "https://uat-spatial-gis.information.qld.gov.au/arcgis/rest/services/QldGlobe/CadastralFramework"
+	var service = "https://gisservices4.information.qld.gov.au/arcgis/rest/services/QldGlobe/CadastralFramework"
+
+	for i := 0; i < 1000; i++ {
+		offset := 10000.0
+		xOffset := rand.Float64() * offset
+		yOffset := rand.Float64() * offset
+		x1 := 17034035.497954994 + xOffset
+		y1 := -3182509.574853155 + yOffset
+		x2 := 17035752.942434132 + xOffset
+		y2 := -3183816.039204464 + yOffset
+		urls = append(urls, fmt.Sprintf("%s/MapServer/export?bbox=%f,%f,%f,%f", service, x1, y1, x2, y2))
+	}
+
+	// fmt.Printf("len=%d cap=%d %v\n", len(urls), cap(urls), urls)
+
+	// urls := strings.Split(flag.Args()[0], ";")
 	method := strings.ToUpper(*m)
 
 	// set content-type
@@ -192,7 +212,6 @@ func main() {
 		}
 	}
 
-	rand.Seed(time.Now().Unix())
 	n := rand.Int() % len(urls)
 	url := urls[n]
 

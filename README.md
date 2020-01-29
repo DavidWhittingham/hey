@@ -1,4 +1,12 @@
-![hey](http://i.imgur.com/szzD9q0.png)
+- Install go from golang website
+- Run fiddler
+- Execute the following command
+
+```
+go build && hey -n 100 -c 2 -x http://localhost:8888 ""
+```
+
+<!-- ![hey](http://i.imgur.com/szzD9q0.png)
 
 [![Build Status](https://travis-ci.org/rakyll/hey.svg?branch=master)](https://travis-ci.org/rakyll/hey)
 
@@ -63,4 +71,4 @@ Options:
                         (default for current machine is 8 cores)
 ```
 
-Previously known as [github.com/rakyll/boom](https://github.com/rakyll/boom).
+Previously known as [github.com/rakyll/boom](https://github.com/rakyll/boom). -->
